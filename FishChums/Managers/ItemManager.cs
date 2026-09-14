@@ -2233,10 +2233,14 @@ public static class PrefabManager
 			RegisterStatusEffect(shared.m_consumeStatusEffect);
 			RegisterStatusEffect(shared.m_equipStatusEffect);
 			RegisterStatusEffect(shared.m_setStatusEffect);
-		}
+			}
 
-		__instance.UpdateRegisters();
-	}
+			// Valheim 1.0.12: ObjectDB.UpdateRegisters is private now — call via cached reflection.
+			UpdateRegistersMethod?.Invoke(__instance, null);
+			}
+
+			private static readonly System.Reflection.MethodInfo UpdateRegistersMethod =
+			AccessTools.Method(typeof(ObjectDB), "UpdateRegisters");
 
 
 	
