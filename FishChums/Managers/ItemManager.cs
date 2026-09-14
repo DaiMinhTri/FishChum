@@ -1963,8 +1963,9 @@ public class Item
 				if (Assembly.GetExecutingAssembly().GetType("ServerSync.ConfigSync") is { } configSyncType)
 				{
 					_configSync = Activator.CreateInstance(configSyncType, plugin.Info.Metadata.GUID + " ItemManager");
-					configSyncType.GetField("CurrentVersion").SetValue(_configSync, plugin.Info.Metadata.Version.ToString());
-					configSyncType.GetProperty("IsLocked")!.SetValue(_configSync, true);
+					// Null-safe: vendored ServerSync may lack CurrentVersion/IsLocked members.
+					configSyncType.GetField("CurrentVersion")?.SetValue(_configSync, plugin.Info.Metadata.Version.ToString());
+					configSyncType.GetProperty("IsLocked")?.SetValue(_configSync, true);
 				}
 				else
 				{
