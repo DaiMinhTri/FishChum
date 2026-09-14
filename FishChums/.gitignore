@@ -5,4 +5,10 @@ riderModule.iml
 /_ReSharper.Caches/
 .idea/
 .vs/
-FishChums.sln.DotSettings.user
+FishChums.sln.DotSettings.userbin/
+obj/
+publish/
+Thunderstore/
+Nexus/
+packages/
+*.zip
