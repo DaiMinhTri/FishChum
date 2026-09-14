@@ -2010,7 +2010,7 @@ public class LocalizeKey
 			alias = $"${alias}";
 		}
 		Localizations["alias"] = alias;
-		Localization.instance.AddWord(Key, Localization.instance.Localize(alias));
+		LocalizationCache.AddWord(Localization.instance, Key, Localization.instance.Localize(alias));
 	}
 
 	public LocalizeKey English(string key) => addForLang("English", key);
@@ -2053,11 +2053,11 @@ public class LocalizeKey
 		Localizations[lang] = value;
 		if (Localization.instance.GetSelectedLanguage() == lang)
 		{
-			Localization.instance.AddWord(Key, value);
+			LocalizationCache.AddWord(Localization.instance, Key, value);
 		}
-		else if (lang == "English" && !Localization.instance.m_translations.ContainsKey(Key))
+		else if (lang == "English" && !LocalizationCache.ContainsKey(Localization.instance, Key))
 		{
-			Localization.instance.AddWord(Key, value);
+			LocalizationCache.AddWord(Localization.instance, Key, value);
 		}
 		return this;
 	}
@@ -2069,11 +2069,11 @@ public class LocalizeKey
 		{
 			if (key.Localizations.TryGetValue(language, out string Translation) || key.Localizations.TryGetValue("English", out Translation))
 			{
-				__instance.AddWord(key.Key, Translation);
+				LocalizationCache.AddWord(__instance, key.Key, Translation);
 			}
 			else if (key.Localizations.TryGetValue("alias", out string alias))
 			{
-				__instance.AddWord(key.Key, Localization.instance.Localize(alias));
+				LocalizationCache.AddWord(__instance, key.Key, Localization.instance.Localize(alias));
 			}
 		}
 	}
@@ -2081,6 +2081,22 @@ public class LocalizeKey
 
 public static class LocalizationCache
 {
+	// Valheim 1.0.12: Localization.AddWord and m_translations are private now.
+	// Cached reflection shims preserve the old public API usage in vendored code.
+	private static readonly System.Reflection.MethodInfo AddWordMethod = AccessTools.Method(typeof(Localization), "AddWord");
+	private static readonly System.Reflection.FieldInfo TranslationsField = AccessTools.Field(typeof(Localization), "m_translations");
+
+	internal static void AddWord(Localization loc, string key, string value)
+	{
+		AddWordMethod?.Invoke(loc, new object[] { key, value });
+	}
+
+	internal static bool ContainsKey(Localization loc, string key)
+	{
+		if (TranslationsField?.GetValue(loc) is not Dictionary<string, string> translations) return true; // fail open: add the word
+		return translations.ContainsKey(key);
+	}
+
 	private static readonly Dictionary<string, Localization> localizations = new();
 
 	internal static void LocalizationPostfix(Localization __instance, string language)
