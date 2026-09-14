@@ -17,7 +17,7 @@ namespace FishChums;
 public class FishChumsPlugin : BaseUnityPlugin
 {
     internal const string ModName = "FishChum";
-    internal const string ModVersion = "1.0.4";
+    internal const string ModVersion = "1.0.5";
     internal const string Author = "RustyMods";
     private const string ModGUID = Author + "." + ModName;
     private static readonly string ConfigFileName = ModGUID + ".cfg";

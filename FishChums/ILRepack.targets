@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <Target Name="ILRepacker" AfterTargets="Build">
+    <Target Name="ILRepacker" AfterTargets="Build" Condition="'$(DisableILRepack)' != 'true'">
         <ItemGroup>
             <InputAssemblies Include="$(TargetPath)" />
             <!-- Only use the line below if you choose to use the DLL and not the class. If you choose the DLL, be sure to reference and 

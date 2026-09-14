@@ -1,0 +1,9 @@
+{
+  "name": "FishChum",
+  "version_number": "1.0.5",
+  "website_url": "https://github.com/DaiMinhTri/FishChum",
+  "description": "Craftable fish chum to attract fish and more fish based foods to cook",
+  "dependencies": [
+    "denikson-BepInExPack_Valheim-5.4.2350"
+  ]
+}

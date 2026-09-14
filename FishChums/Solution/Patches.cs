@@ -312,8 +312,8 @@ public static class Patches
                 if (requirement.m_resItem.m_itemData.m_shared.m_itemType is not ItemDrop.ItemData.ItemType.Fish) continue;
                 ItemDrop.ItemData? inventoryItem = player.GetInventory().GetItem(requirement.m_resItem.m_itemData.m_shared.m_name);
                 if (inventoryItem is not { m_quality: > 1 }) continue;
-                player.GetInventory().AddItem(__instance.m_craftRecipe.m_item.gameObject.name, inventoryItem.m_quality,
-                    1, -1, player.GetPlayerID(), player.GetPlayerName());
+                player.GetInventory().AddItem(__instance.m_craftRecipe.m_item.gameObject.name, 1, inventoryItem.m_quality,
+                    -1, player.GetPlayerID(), player.GetPlayerName(), false, false);
                 return;
             }
         }
