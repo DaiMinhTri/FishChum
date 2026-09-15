@@ -1069,14 +1069,28 @@ public class Item
 		}
 	}
 
+	// Valheim 1.0.12: ItemDrop.s_instances is private now — read via cached reflection.
+	private static readonly System.Reflection.FieldInfo ItemDropInstancesField =
+		AccessTools.Field(typeof(ItemDrop), "s_instances");
+
+	private static IEnumerable<ItemDrop> GetItemDropInstances() =>
+		ItemDropInstancesField?.GetValue(null) as List<ItemDrop> ?? Enumerable.Empty<ItemDrop>();
+
+	// Valheim 1.0.12: Player.s_players is private now — read via cached reflection.
+	private static readonly System.Reflection.FieldInfo PlayerInstancesField =
+		AccessTools.Field(typeof(Player), "s_players");
+
+	private static IEnumerable<Player> GetPlayerInstances() =>
+		PlayerInstancesField?.GetValue(null) as List<Player> ?? Enumerable.Empty<Player>();
+
 	public static void ApplyToAllInstances(GameObject prefab, Action<ItemDrop.ItemData> callback)
 	{
 		callback(prefab.GetComponent<ItemDrop>().m_itemData);
 
 		string itemName = prefab.GetComponent<ItemDrop>().m_itemData.m_shared.m_name;
 
-		Inventory[] inventories = Player.s_players.Select(p => p.GetInventory()).Concat(UnityEngine.Object.FindObjectsOfType<Container>().Select(c => c.GetInventory())).Where(c => c is not null).ToArray();
-		foreach (ItemDrop.ItemData itemdata in ObjectDB.instance.m_items.Select(p => p.GetComponent<ItemDrop>()).Where(c => c && c.GetComponent<ZNetView>()).Concat(ItemDrop.s_instances).Select(i => i.m_itemData).Concat(inventories.SelectMany(i => i.GetAllItems())))
+		Inventory[] inventories = GetPlayerInstances().Select(p => p.GetInventory()).Concat(UnityEngine.Object.FindObjectsOfType<Container>().Select(c => c.GetInventory())).Where(c => c is not null).ToArray();
+		foreach (ItemDrop.ItemData itemdata in ObjectDB.instance.m_items.Select(p => p.GetComponent<ItemDrop>()).Where(c => c && c.GetComponent<ZNetView>()).Concat(GetItemDropInstances()).Select(i => i.m_itemData).Concat(inventories.SelectMany(i => i.GetAllItems())))
 		{
 			if (itemdata.m_shared.m_name == itemName)
 			{
@@ -1464,7 +1478,7 @@ public class Item
 		{
 			drops = new SerializedDrop(config.Value);
 		}
-		foreach (KeyValuePair<Character, CharacterDrop.Drop> kv in drops.toCharacterDrops(ZNetScene.s_instance, Prefab))
+		foreach (KeyValuePair<Character, CharacterDrop.Drop> kv in drops.toCharacterDrops(ZNetScene.instance, Prefab))
 		{
 			if (kv.Key.GetComponent<CharacterDrop>() is not { } characterDrop)
 			{
